@@ -52,15 +52,29 @@ Flutter frontend-only app with mock data. Design: glassmorphism, gold accent, DM
 
 ---
 
-## In Progress / Next Up
+---
 
-### 🔲 Home Screen (next)
-- Loyalty summary card (glass, gold gradient)
-- Quick actions grid
-- Promo carousel (auto-scroll)
-- Today's Picks & Best Sellers horizontal scrolls
-- Gamification nudge card
-- Bottom navigation bar shell
+### ✅ Session 2 — Home Screen
+
+#### Mock Data Extensions
+| File | Description |
+|---|---|
+| `lib/mock/mock_data.dart` | Added `MenuCategory`, `MenuItem`, `PromoItem` models; 8 menu items, 4 promo banners, `todaysPicks` + `bestSellers` getters, tier name/threshold maps |
+
+#### Home Feature
+| File | Description |
+|---|---|
+| `lib/features/home/screens/home_screen.dart` | Full home screen: 5-tab `NavigationBar` shell, `CustomScrollView` with floating `SliverAppBar` (greeting, search, notification dot) |
+| `lib/features/home/widgets/loyalty_card.dart` | Dark gold gradient card — tier badge, points balance (44pt), linear progress to Platinum |
+| `lib/features/home/widgets/quick_actions_row.dart` | 4-item row: Order (gold), Reserve, Loyalty, Wallet |
+| `lib/features/home/widgets/promo_carousel.dart` | Auto-scroll `PageView` (4s timer), `SmoothPageIndicator` dots |
+| `lib/features/home/widgets/menu_item_card.dart` | 160dp wide card: emoji image, badge (Best Seller/New/Popular), price, rating, Add button |
+| `lib/features/home/widgets/section_header.dart` | Title + "See all" row |
+| `lib/features/home/widgets/gamification_card.dart` | Points-to-Platinum nudge card |
+
+---
+
+## In Progress / Next Up
 
 ### 🔲 Menu Screen
 ### 🔲 Cart Screen
