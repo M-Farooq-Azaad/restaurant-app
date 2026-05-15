@@ -83,4 +83,4 @@ Flutter frontend-only app with mock data. Design: glassmorphism, gold accent, DM
 ## Git Workflow
 - Push after each screen is completed
 - Branch: `main`
-- Repo: https://github.com/mfaju/restaurant_app *(update if different)*
+- Repo: https://github.com/M-Farooq-Azaad/restaurant-app
