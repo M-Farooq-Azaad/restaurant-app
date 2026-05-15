@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_text_styles.dart';
@@ -18,6 +19,7 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   String? _selectedCategoryId;
   bool _isGridView = true;
+  int _filterVersion = 0;
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -43,6 +45,29 @@ class _MenuScreenState extends State<MenuScreen> {
           .toList();
     }
     return items;
+  }
+
+  void _onSearchChanged(String v) {
+    setState(() {
+      _searchQuery = v;
+      _filterVersion++;
+    });
+  }
+
+  void _onCategorySelected(String? categoryId) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _selectedCategoryId = categoryId;
+      _filterVersion++;
+    });
+  }
+
+  void _onToggleView() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _isGridView = !_isGridView;
+      _filterVersion++;
+    });
   }
 
   @override
@@ -71,15 +96,20 @@ class _MenuScreenState extends State<MenuScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
-                      HapticFeedback.selectionClick();
-                      setState(() => _isGridView = !_isGridView);
-                    },
-                    icon: Icon(
-                      _isGridView
-                          ? Icons.view_list_rounded
-                          : Icons.grid_view_rounded,
-                      color: colors.textPrimary,
+                    onPressed: _onToggleView,
+                    icon: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(opacity: animation, child: child),
+                      ),
+                      child: Icon(
+                        _isGridView
+                            ? Icons.view_list_rounded
+                            : Icons.grid_view_rounded,
+                        key: ValueKey(_isGridView),
+                        color: colors.textPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -92,10 +122,8 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               child: TextField(
                 controller: _searchController,
-                onChanged: (v) => setState(() => _searchQuery = v),
-                style: AppTextStyles.bodyLg.copyWith(
-                  color: colors.textPrimary,
-                ),
+                onChanged: _onSearchChanged,
+                style: AppTextStyles.bodyLg.copyWith(color: colors.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'Search dishes...',
                   hintStyle: AppTextStyles.bodyLg.copyWith(
@@ -110,7 +138,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       ? IconButton(
                           onPressed: () {
                             _searchController.clear();
-                            setState(() => _searchQuery = '');
+                            _onSearchChanged('');
                           },
                           icon: Icon(
                             Icons.close_rounded,
@@ -151,8 +179,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 itemCount: MockData.categories.length + 1,
                 itemBuilder: (_, i) {
                   final isAll = i == 0;
-                  final category =
-                      isAll ? null : MockData.categories[i - 1];
+                  final category = isAll ? null : MockData.categories[i - 1];
                   final isSelected = isAll
                       ? _selectedCategoryId == null
                       : _selectedCategoryId == category!.id;
@@ -164,13 +191,8 @@ class _MenuScreenState extends State<MenuScreen> {
                           ? 'All'
                           : '${category!.emoji} ${category.name}',
                       isSelected: isSelected,
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        setState(
-                          () => _selectedCategoryId =
-                              isAll ? null : category!.id,
-                        );
-                      },
+                      onTap: () =>
+                          _onCategorySelected(isAll ? null : category!.id),
                     ),
                   );
                 },
@@ -179,20 +201,41 @@ class _MenuScreenState extends State<MenuScreen> {
             const SizedBox(height: Sp.sm),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Sp.base),
-              child: Text(
-                '${items.length} ${items.length == 1 ? 'dish' : 'dishes'}',
-                style: AppTextStyles.bodyMd.copyWith(
-                  color: colors.textTertiary,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: Text(
+                  '${items.length} ${items.length == 1 ? 'dish' : 'dishes'}',
+                  key: ValueKey(items.length),
+                  style: AppTextStyles.bodyMd.copyWith(
+                    color: colors.textTertiary,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: Sp.sm),
             Expanded(
-              child: items.isEmpty
-                  ? const _EmptyState()
-                  : _isGridView
-                      ? _GridContent(items: items)
-                      : _ListContent(items: items),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+                child: items.isEmpty
+                    ? const _EmptyState(key: ValueKey('empty'))
+                    : _isGridView
+                        ? _GridContent(
+                            key: ValueKey('grid_$_filterVersion'),
+                            items: items,
+                            filterVersion: _filterVersion,
+                          )
+                        : _ListContent(
+                            key: ValueKey('list_$_filterVersion'),
+                            items: items,
+                            filterVersion: _filterVersion,
+                          ),
+              ),
             ),
           ],
         ),
@@ -245,18 +288,14 @@ class _CategoryChip extends StatelessWidget {
 
 class _GridContent extends StatelessWidget {
   final List<MenuItem> items;
+  final int filterVersion;
 
-  const _GridContent({required this.items});
+  const _GridContent({super.key, required this.items, required this.filterVersion});
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(
-        Sp.base,
-        0,
-        Sp.base,
-        Sp.xxxl,
-      ),
+      padding: const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.xxxl),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: Sp.md,
@@ -264,15 +303,32 @@ class _GridContent extends StatelessWidget {
         childAspectRatio: 0.72,
       ),
       itemCount: items.length,
-      itemBuilder: (_, i) => MenuGridCard(item: items[i]),
+      itemBuilder: (_, i) => MenuGridCard(
+        key: ValueKey('${items[i].id}_$filterVersion'),
+        item: items[i],
+      )
+          .animate()
+          .fadeIn(
+            duration: 280.ms,
+            delay: (i * 45).ms,
+            curve: Curves.easeOut,
+          )
+          .slideY(
+            begin: 0.06,
+            end: 0,
+            duration: 280.ms,
+            delay: (i * 45).ms,
+            curve: Curves.easeOut,
+          ),
     );
   }
 }
 
 class _ListContent extends StatelessWidget {
   final List<MenuItem> items;
+  final int filterVersion;
 
-  const _ListContent({required this.items});
+  const _ListContent({super.key, required this.items, required this.filterVersion});
 
   @override
   Widget build(BuildContext context) {
@@ -280,13 +336,29 @@ class _ListContent extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.xxxl),
       itemCount: items.length,
       separatorBuilder: (_, __) => const SizedBox(height: Sp.sm),
-      itemBuilder: (_, i) => MenuListTile(item: items[i]),
+      itemBuilder: (_, i) => MenuListTile(
+        key: ValueKey('${items[i].id}_$filterVersion'),
+        item: items[i],
+      )
+          .animate()
+          .fadeIn(
+            duration: 260.ms,
+            delay: (i * 40).ms,
+            curve: Curves.easeOut,
+          )
+          .slideX(
+            begin: -0.04,
+            end: 0,
+            duration: 260.ms,
+            delay: (i * 40).ms,
+            curve: Curves.easeOut,
+          ),
     );
   }
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -310,6 +382,9 @@ class _EmptyState extends StatelessWidget {
           ),
         ],
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: 300.ms, curve: Curves.easeOut)
+        .scale(begin: const Offset(0.95, 0.95), duration: 300.ms, curve: Curves.easeOut);
   }
 }
