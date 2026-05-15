@@ -4,6 +4,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../mock/mock_data.dart';
+import '../../menu/screens/item_detail_screen.dart';
 
 class MenuItemCard extends StatelessWidget {
   final MenuItem item;
@@ -13,9 +14,14 @@ class MenuItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: Sp.md),
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ItemDetailScreen(item: item)),
+      ),
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: Sp.md),
       decoration: BoxDecoration(
         color: colors.bgSecondary,
         borderRadius: BorderRadius.circular(Rd.xl),
@@ -118,6 +124,7 @@ class MenuItemCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

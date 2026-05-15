@@ -4,6 +4,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../mock/mock_data.dart';
+import '../screens/item_detail_screen.dart';
 
 class MenuListTile extends StatelessWidget {
   final MenuItem item;
@@ -13,7 +14,12 @@ class MenuListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Container(
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ItemDetailScreen(item: item)),
+      ),
+      child: Container(
       padding: const EdgeInsets.all(Sp.md),
       decoration: BoxDecoration(
         color: colors.bgSecondary,
@@ -129,6 +135,7 @@ class MenuListTile extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
