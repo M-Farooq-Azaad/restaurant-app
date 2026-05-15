@@ -23,6 +23,10 @@ class _MenuScreenState extends State<MenuScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // Show categorised sections only when on "All" tab with no active search.
+  bool get _showCategorized =>
+      _selectedCategoryId == null && _searchQuery.isEmpty;
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -32,7 +36,8 @@ class _MenuScreenState extends State<MenuScreen> {
   List<MenuItem> get _filteredItems {
     var items = MockData.menuItems.toList();
     if (_selectedCategoryId != null) {
-      items = items.where((i) => i.categoryId == _selectedCategoryId).toList();
+      items =
+          items.where((i) => i.categoryId == _selectedCategoryId).toList();
     }
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
@@ -82,8 +87,10 @@ class _MenuScreenState extends State<MenuScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header row
             Padding(
-              padding: const EdgeInsets.fromLTRB(Sp.base, Sp.base, Sp.sm, 0),
+              padding:
+                  const EdgeInsets.fromLTRB(Sp.base, Sp.base, Sp.sm, 0),
               child: Row(
                 children: [
                   Expanded(
@@ -99,9 +106,11 @@ class _MenuScreenState extends State<MenuScreen> {
                     onPressed: _onToggleView,
                     icon: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
-                      transitionBuilder: (child, animation) => ScaleTransition(
+                      transitionBuilder: (child, animation) =>
+                          ScaleTransition(
                         scale: animation,
-                        child: FadeTransition(opacity: animation, child: child),
+                        child:
+                            FadeTransition(opacity: animation, child: child),
                       ),
                       child: Icon(
                         _isGridView
@@ -115,6 +124,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ],
               ),
             ),
+            // Search bar
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: Sp.base,
@@ -123,7 +133,8 @@ class _MenuScreenState extends State<MenuScreen> {
               child: TextField(
                 controller: _searchController,
                 onChanged: _onSearchChanged,
-                style: AppTextStyles.bodyLg.copyWith(color: colors.textPrimary),
+                style:
+                    AppTextStyles.bodyLg.copyWith(color: colors.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'Search dishes...',
                   hintStyle: AppTextStyles.bodyLg.copyWith(
@@ -171,15 +182,18 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
             ),
+            // Category chips
             SizedBox(
               height: 40,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: Sp.base),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: Sp.base),
                 itemCount: MockData.categories.length + 1,
                 itemBuilder: (_, i) {
                   final isAll = i == 0;
-                  final category = isAll ? null : MockData.categories[i - 1];
+                  final category =
+                      isAll ? null : MockData.categories[i - 1];
                   final isSelected = isAll
                       ? _selectedCategoryId == null
                       : _selectedCategoryId == category!.id;
@@ -191,28 +205,33 @@ class _MenuScreenState extends State<MenuScreen> {
                           ? 'All'
                           : '${category!.emoji} ${category.name}',
                       isSelected: isSelected,
-                      onTap: () =>
-                          _onCategorySelected(isAll ? null : category!.id),
+                      onTap: () => _onCategorySelected(
+                        isAll ? null : category!.id,
+                      ),
                     ),
                   );
                 },
               ),
             ),
             const SizedBox(height: Sp.sm),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Sp.base),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Text(
-                  '${items.length} ${items.length == 1 ? 'dish' : 'dishes'}',
-                  key: ValueKey(items.length),
-                  style: AppTextStyles.bodyMd.copyWith(
-                    color: colors.textTertiary,
+            // Result count — hidden in categorized view
+            if (!_showCategorized)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: Sp.base),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    '${items.length} ${items.length == 1 ? 'dish' : 'dishes'}',
+                    key: ValueKey(items.length),
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: colors.textTertiary,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: Sp.sm),
+            if (!_showCategorized) const SizedBox(height: Sp.sm),
+            // Content
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 220),
@@ -222,19 +241,25 @@ class _MenuScreenState extends State<MenuScreen> {
                   opacity: animation,
                   child: child,
                 ),
-                child: items.isEmpty
-                    ? const _EmptyState(key: ValueKey('empty'))
-                    : _isGridView
-                        ? _GridContent(
-                            key: ValueKey('grid_$_filterVersion'),
-                            items: items,
-                            filterVersion: _filterVersion,
-                          )
-                        : _ListContent(
-                            key: ValueKey('list_$_filterVersion'),
-                            items: items,
-                            filterVersion: _filterVersion,
-                          ),
+                child: _showCategorized
+                    ? _AllCategoriesContent(
+                        key: ValueKey('all_${_isGridView}_$_filterVersion'),
+                        isGridView: _isGridView,
+                        filterVersion: _filterVersion,
+                      )
+                    : items.isEmpty
+                        ? const _EmptyState(key: ValueKey('empty'))
+                        : _isGridView
+                            ? _GridContent(
+                                key: ValueKey('grid_$_filterVersion'),
+                                items: items,
+                                filterVersion: _filterVersion,
+                              )
+                            : _ListContent(
+                                key: ValueKey('list_$_filterVersion'),
+                                items: items,
+                                filterVersion: _filterVersion,
+                              ),
               ),
             ),
           ],
@@ -243,6 +268,8 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 }
+
+// ── Category chip ───────────────────────────────────────────────────────────
 
 class _CategoryChip extends StatelessWidget {
   final String label;
@@ -286,16 +313,182 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
+// ── Categorized "All" view ──────────────────────────────────────────────────
+
+class _AllCategoriesContent extends StatelessWidget {
+  final bool isGridView;
+  final int filterVersion;
+
+  const _AllCategoriesContent({
+    super.key,
+    required this.isGridView,
+    required this.filterVersion,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final slivers = <Widget>[];
+
+    for (int ci = 0; ci < MockData.categories.length; ci++) {
+      final category = MockData.categories[ci];
+      final items = MockData.menuItems
+          .where((item) => item.categoryId == category.id)
+          .toList();
+
+      if (items.isEmpty) continue;
+
+      // Section header
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              Sp.base,
+              ci == 0 ? Sp.xs : Sp.xl,
+              Sp.base,
+              Sp.md,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  category.emoji,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(width: Sp.sm),
+                Text(
+                  category.name,
+                  style: AppTextStyles.cardTitle.copyWith(
+                    color: colors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: Sp.xs),
+                Text(
+                  '(${items.length})',
+                  style: AppTextStyles.bodyMd.copyWith(
+                    color: colors.textTertiary,
+                  ),
+                ),
+              ],
+            ),
+          )
+              .animate()
+              .fadeIn(
+                duration: 260.ms,
+                delay: Duration(milliseconds: (ci * 60).clamp(0, 240)),
+              )
+              .slideX(
+                begin: -0.03,
+                end: 0,
+                duration: 260.ms,
+                delay: Duration(milliseconds: (ci * 60).clamp(0, 240)),
+                curve: Curves.easeOut,
+              ),
+        ),
+      );
+
+      // Items grid or list
+      if (isGridView) {
+        slivers.add(
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: Sp.base),
+            sliver: SliverGrid(
+              gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: Sp.md,
+                mainAxisSpacing: Sp.md,
+                childAspectRatio: 0.72,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (_, i) => MenuGridCard(
+                  key: ValueKey('${items[i].id}_$filterVersion'),
+                  item: items[i],
+                )
+                    .animate()
+                    .fadeIn(
+                      duration: 280.ms,
+                      delay: Duration(
+                        milliseconds: (i * 45).clamp(0, 200),
+                      ),
+                      curve: Curves.easeOut,
+                    )
+                    .slideY(
+                      begin: 0.06,
+                      end: 0,
+                      duration: 280.ms,
+                      delay: Duration(
+                        milliseconds: (i * 45).clamp(0, 200),
+                      ),
+                      curve: Curves.easeOut,
+                    ),
+                childCount: items.length,
+              ),
+            ),
+          ),
+        );
+      } else {
+        slivers.add(
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: Sp.base),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (_, i) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: i < items.length - 1 ? Sp.sm : 0,
+                  ),
+                  child: MenuListTile(
+                    key: ValueKey('${items[i].id}_$filterVersion'),
+                    item: items[i],
+                  )
+                      .animate()
+                      .fadeIn(
+                        duration: 260.ms,
+                        delay: Duration(
+                          milliseconds: (i * 40).clamp(0, 200),
+                        ),
+                        curve: Curves.easeOut,
+                      )
+                      .slideX(
+                        begin: -0.04,
+                        end: 0,
+                        duration: 260.ms,
+                        delay: Duration(
+                          milliseconds: (i * 40).clamp(0, 200),
+                        ),
+                        curve: Curves.easeOut,
+                      ),
+                ),
+                childCount: items.length,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    slivers.add(const SliverToBoxAdapter(child: SizedBox(height: Sp.xxxl)));
+
+    return CustomScrollView(slivers: slivers);
+  }
+}
+
+// ── Filtered flat views ─────────────────────────────────────────────────────
+
 class _GridContent extends StatelessWidget {
   final List<MenuItem> items;
   final int filterVersion;
 
-  const _GridContent({super.key, required this.items, required this.filterVersion});
+  const _GridContent({
+    super.key,
+    required this.items,
+    required this.filterVersion,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.xxxl),
+      padding:
+          const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.xxxl),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: Sp.md,
@@ -310,14 +503,14 @@ class _GridContent extends StatelessWidget {
           .animate()
           .fadeIn(
             duration: 280.ms,
-            delay: (i * 45).ms,
+            delay: Duration(milliseconds: (i * 45).clamp(0, 200)),
             curve: Curves.easeOut,
           )
           .slideY(
             begin: 0.06,
             end: 0,
             duration: 280.ms,
-            delay: (i * 45).ms,
+            delay: Duration(milliseconds: (i * 45).clamp(0, 200)),
             curve: Curves.easeOut,
           ),
     );
@@ -328,12 +521,17 @@ class _ListContent extends StatelessWidget {
   final List<MenuItem> items;
   final int filterVersion;
 
-  const _ListContent({super.key, required this.items, required this.filterVersion});
+  const _ListContent({
+    super.key,
+    required this.items,
+    required this.filterVersion,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.xxxl),
+      padding:
+          const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.xxxl),
       itemCount: items.length,
       separatorBuilder: (_, __) => const SizedBox(height: Sp.sm),
       itemBuilder: (_, i) => MenuListTile(
@@ -343,19 +541,21 @@ class _ListContent extends StatelessWidget {
           .animate()
           .fadeIn(
             duration: 260.ms,
-            delay: (i * 40).ms,
+            delay: Duration(milliseconds: (i * 40).clamp(0, 200)),
             curve: Curves.easeOut,
           )
           .slideX(
             begin: -0.04,
             end: 0,
             duration: 260.ms,
-            delay: (i * 40).ms,
+            delay: Duration(milliseconds: (i * 40).clamp(0, 200)),
             curve: Curves.easeOut,
           ),
     );
   }
 }
+
+// ── Empty state ─────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState({super.key});
@@ -378,13 +578,19 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: Sp.xs),
           Text(
             'Try a different search or category',
-            style: AppTextStyles.bodyMd.copyWith(color: colors.textTertiary),
+            style: AppTextStyles.bodyMd.copyWith(
+              color: colors.textTertiary,
+            ),
           ),
         ],
       ),
     )
         .animate()
         .fadeIn(duration: 300.ms, curve: Curves.easeOut)
-        .scale(begin: const Offset(0.95, 0.95), duration: 300.ms, curve: Curves.easeOut);
+        .scale(
+          begin: const Offset(0.95, 0.95),
+          duration: 300.ms,
+          curve: Curves.easeOut,
+        );
   }
 }
