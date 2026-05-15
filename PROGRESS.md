@@ -74,9 +74,21 @@ Flutter frontend-only app with mock data. Design: glassmorphism, gold accent, DM
 
 ---
 
+---
+
+### ✅ Session 3 — Menu Screen
+
+#### Menu Feature
+| File | Description |
+|---|---|
+| `lib/features/menu/screens/menu_screen.dart` | Full menu screen: search bar, category filter chips, grid/list toggle, filtered results, empty state |
+| `lib/features/menu/widgets/menu_grid_card.dart` | 2-column grid card: emoji image, badge, name, description, price, rating, gold Add button |
+| `lib/features/menu/widgets/menu_list_tile.dart` | List row: emoji thumbnail, name+desc+rating+prep time, price, square Add button |
+
+---
+
 ## In Progress / Next Up
 
-### 🔲 Menu Screen
 ### 🔲 Cart Screen
 ### 🔲 Order Tracking Screen
 ### 🔲 Loyalty Screen
