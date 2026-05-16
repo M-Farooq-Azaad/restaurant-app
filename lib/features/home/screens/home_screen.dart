@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme_extension.dart';
 import '../../../mock/mock_data.dart';
 import '../../loyalty/screens/loyalty_screen.dart';
 import '../../menu/screens/menu_screen.dart';
+import '../../profile/screens/profile_screen.dart';
 import '../widgets/gamification_card.dart';
 import '../widgets/loyalty_card.dart';
 import '../widgets/menu_item_card.dart';
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           MenuScreen(),
           _PlaceholderTab(label: 'Cart', emoji: '🛒'),
           LoyaltyScreen(),
-          _PlaceholderTab(label: 'Profile', emoji: '👤'),
+          ProfileScreen(),
         ],
       ),
       bottomNavigationBar: _BottomNav(
