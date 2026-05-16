@@ -21,7 +21,8 @@ class RestaurantApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: themeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
+      themeMode:
+          themeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,
     );
   }

@@ -55,58 +55,127 @@ class _BottomNav extends StatelessWidget {
 
   const _BottomNav({required this.currentIndex, required this.onTap});
 
+  static const _icons = [
+    (Icons.storefront_outlined, Icons.storefront_rounded),
+    (Icons.menu_book_outlined, Icons.menu_book_rounded),
+    (Icons.shopping_cart_outlined, Icons.shopping_cart_rounded),
+    (Icons.workspace_premium_outlined, Icons.workspace_premium_rounded),
+    (Icons.account_circle_outlined, Icons.account_circle_rounded),
+  ];
+
+  static const _labels = ['Home', 'Menu', 'Cart', 'Rewards', 'Profile'];
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.bgSecondary,
-        border: Border(top: BorderSide(color: colors.divider, width: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
-        ],
+    return Padding(
+      padding: EdgeInsets.only(
+        left: Sp.xl,
+        right: Sp.xl,
+        bottom: MediaQuery.of(context).padding.bottom + Sp.md,
+        top: Sp.xs,
       ),
-      child: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: onTap,
-        backgroundColor: Colors.transparent,
-        indicatorColor: AppColors.accentSoft,
-        shadowColor: Colors.transparent,
-        elevation: 0,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded, color: colors.accent),
-            label: 'Home',
+      child: Container(
+        height: 64,
+        decoration: BoxDecoration(
+          color: colors.bgSecondary,
+          borderRadius: BorderRadius.circular(Rd.xxl),
+          border: Border.all(color: colors.divider, width: 0.8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 32,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: List.generate(
+            _labels.length,
+            (i) => _NavItem(
+              icon: _icons[i].$1,
+              selectedIcon: _icons[i].$2,
+              label: _labels[i],
+              isSelected: currentIndex == i,
+              onTap: () => onTap(i),
+            ),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.restaurant_menu_outlined),
-            selectedIcon:
-                Icon(Icons.restaurant_menu_rounded, color: colors.accent),
-            label: 'Menu',
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.shopping_bag_outlined),
-            selectedIcon:
-                Icon(Icons.shopping_bag_rounded, color: colors.accent),
-            label: 'Cart',
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.stars_outlined),
-            selectedIcon: Icon(Icons.stars_rounded, color: colors.accent),
-            label: 'Loyalty',
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded, color: colors.accent),
-            label: 'Profile',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 260),
+              curve: Curves.easeInOut,
+              width: isSelected ? 48 : 36,
+              height: 32,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.accentSoft : Colors.transparent,
+                borderRadius: BorderRadius.circular(Rd.lg),
+              ),
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  transitionBuilder: (child, anim) => ScaleTransition(
+                    scale: anim,
+                    child: FadeTransition(opacity: anim, child: child),
+                  ),
+                  child: Icon(
+                    isSelected ? selectedIcon : icon,
+                    key: ValueKey(isSelected),
+                    size: isSelected ? 22 : 20,
+                    color:
+                        isSelected ? AppColors.accentDeep : colors.textTertiary,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 3),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: AppTextStyles.labelSm.copyWith(
+                color: isSelected ? AppColors.accentDeep : colors.textTertiary,
+                fontSize: 10,
+                fontWeight:
+                    isSelected ? FontWeight.w600 : FontWeight.w400,
+                letterSpacing: 0.2,
+              ),
+              child: Text(label),
+            ),
+          ],
+        ),
       ),
     );
   }
