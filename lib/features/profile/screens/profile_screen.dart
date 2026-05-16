@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../mock/mock_data.dart';
+import '../../auth/providers/auth_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -159,7 +161,12 @@ class ProfileScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: Sp.xl),
-                  _SignOutButton(),
+                  _SignOutButton(
+                    onConfirm: () async {
+                      await ref.read(authProvider.notifier).logout();
+                      if (context.mounted) context.go('/auth/login');
+                    },
+                  ),
                   const SizedBox(height: Sp.xxxl),
                 ],
               ),
@@ -637,6 +644,10 @@ class _ReferralChip extends StatelessWidget {
 }
 
 class _SignOutButton extends StatelessWidget {
+  final Future<void> Function() onConfirm;
+
+  const _SignOutButton({required this.onConfirm});
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -645,7 +656,7 @@ class _SignOutButton extends StatelessWidget {
         HapticFeedback.mediumImpact();
         showDialog<void>(
           context: context,
-          builder: (_) => AlertDialog(
+          builder: (dialogContext) => AlertDialog(
             backgroundColor: colors.bgSecondary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(Rd.xl),
@@ -662,7 +673,7 @@ class _SignOutButton extends StatelessWidget {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
                   'Cancel',
                   style: AppTextStyles.labelMd.copyWith(
@@ -671,7 +682,10 @@ class _SignOutButton extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  onConfirm();
+                },
                 child: Text(
                   'Sign Out',
                   style: AppTextStyles.labelMd.copyWith(color: AppColors.error),
