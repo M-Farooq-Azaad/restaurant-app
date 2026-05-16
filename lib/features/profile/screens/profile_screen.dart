@@ -10,6 +10,9 @@ import '../../../core/theme/theme_provider.dart';
 import '../../../mock/mock_data.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'edit_profile_screen.dart';
+import 'language_screen.dart';
+import 'payment_methods_screen.dart';
+import 'saved_addresses_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -59,13 +62,21 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.location_on_outlined,
                         label: 'Saved Addresses',
                         iconColor: AppColors.success,
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SavedAddressesScreen(),
+                          ),
+                        ),
                       ),
                       _RowItem(
                         icon: Icons.credit_card_rounded,
                         label: 'Payment Methods',
                         iconColor: const Color(0xFF6366F1),
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PaymentMethodsScreen(),
+                          ),
+                        ),
                         isLast: true,
                       ),
                     ],
@@ -87,7 +98,11 @@ class ProfileScreen extends ConsumerWidget {
                         label: 'Language',
                         iconColor: const Color(0xFF0EA5E9),
                         valueLabel: 'English',
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const LanguageScreen(),
+                          ),
+                        ),
                         isLast: true,
                       ),
                     ],
