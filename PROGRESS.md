@@ -87,14 +87,66 @@ Flutter frontend-only app with mock data. Design: glassmorphism, gold accent, DM
 
 ---
 
+### ✅ Session 4 — Item Detail Screen + Menu Enhancements
+
+#### Menu Feature Enhancements
+| File | Description |
+|---|---|
+| `lib/features/menu/screens/menu_screen.dart` | 10 items per category, categorised "All" view with section headers, staggered reorder animation on filter/search change |
+
+#### Item Detail Feature
+| File | Description |
+|---|---|
+| `lib/features/menu/screens/item_detail_screen.dart` | Full item detail: hero image (emoji), name, rating, prep time, description, dietary badges, quantity selector (−/+), total price, "Add to Cart" gold button, horizontal related items row |
+
+---
+
+### ✅ Session 5 — Loyalty Screen + Profile Screen
+
+#### Mock Data Extensions
+| File | Description |
+|---|---|
+| `lib/mock/mock_data.dart` | Added `LoyaltyReward` + `LoyaltyTransaction` models; `loyaltyRewards` (6 rewards), `loyaltyHistory` (10 transactions) |
+
+#### Assets
+| File | Description |
+|---|---|
+| `assets/images/avatar.jpg` | User profile photo — circular gold-bordered avatar |
+
+#### Loyalty Feature
+| File | Description |
+|---|---|
+| `lib/features/loyalty/screens/loyalty_screen.dart` | 3-tab screen (Earn / Redeem / History) with dark gold gradient header, points balance, tier badge, progress bar, animated pill tab selector |
+| — Earn tab | 5 earn-method cards + tier benefits comparison table (Bronze/Silver/Gold/Platinum) |
+| — Redeem tab | 2-column grid of reward cards; gold Redeem button if affordable, locked gray if not; SnackBar on redeem |
+| — History tab | Chronological transaction list — green `+pts` earned, red `−pts` redeemed |
+
+#### Profile Feature
+| File | Description |
+|---|---|
+| `lib/features/profile/screens/profile_screen.dart` | Full profile screen: dark gold gradient header with photo avatar (gold border + glow), stats row (orders/points/tier), grouped settings sections, dark mode toggle, referral chip, sign-out with confirmation dialog |
+| — Dark mode toggle | `Switch.adaptive` wired to `ThemeNotifier.setTheme()` via Riverpod |
+| — Sign out | `AlertDialog` confirmation → `AuthNotifier.logout()` → `context.go('/auth/login')` |
+| — Referral | Copies username to clipboard on tap + SnackBar feedback |
+
+---
+
 ## In Progress / Next Up
 
 ### 🔲 Cart Screen
 ### 🔲 Order Tracking Screen
-### 🔲 Loyalty Screen
-### 🔲 Profile Screen
 ### 🔲 Wallet Screen
-### 🔲 All other screens (see blueprint)
+### 🔲 QR Code Screen
+### 🔲 Edit Profile Screen
+### 🔲 Notifications Screen
+### 🔲 Favorites Screen
+### 🔲 Referral Screen
+### 🔲 Challenges & Badges Screen
+### 🔲 Spin Wheel Screen
+### 🔲 Reservation Screen
+### 🔲 Reviews Screen
+### 🔲 Saved Addresses Screen
+### 🔲 Appearance / Settings Screen
 
 ---
 
@@ -108,5 +160,5 @@ Flutter frontend-only app with mock data. Design: glassmorphism, gold accent, DM
 
 ## Git Workflow
 - Push after each screen is completed
-- Branch: `main`
+- Branch: `master`
 - Repo: https://github.com/M-Farooq-Azaad/restaurant-app
