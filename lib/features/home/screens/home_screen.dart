@@ -5,6 +5,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/theme/app_theme_extension.dart';
 import '../../../mock/mock_data.dart';
+import '../../loyalty/screens/loyalty_screen.dart';
 import '../../menu/screens/menu_screen.dart';
 import '../widgets/gamification_card.dart';
 import '../widgets/loyalty_card.dart';
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _HomeTab(),
           MenuScreen(),
           _PlaceholderTab(label: 'Cart', emoji: '🛒'),
-          _PlaceholderTab(label: 'Loyalty', emoji: '⭐'),
+          LoyaltyScreen(),
           _PlaceholderTab(label: 'Profile', emoji: '👤'),
         ],
       ),

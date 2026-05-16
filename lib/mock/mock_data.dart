@@ -78,6 +78,40 @@ class PromoItem {
   });
 }
 
+class LoyaltyReward {
+  final String id;
+  final String title;
+  final String subtitle;
+  final String emoji;
+  final int pointsCost;
+
+  const LoyaltyReward({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.emoji,
+    required this.pointsCost,
+  });
+}
+
+class LoyaltyTransaction {
+  final String id;
+  final String title;
+  final String subtitle;
+  final int points;
+  final String dateLabel;
+  final bool isEarned;
+
+  const LoyaltyTransaction({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.points,
+    required this.dateLabel,
+    required this.isEarned,
+  });
+}
+
 class MockData {
   static const currentUser = MockUser(
     id: 'user_001',
@@ -856,4 +890,132 @@ class MockData {
     'tier_gold': 'Gold',
     'tier_platinum': 'Platinum',
   };
+
+  static const List<LoyaltyReward> loyaltyRewards = [
+    LoyaltyReward(
+      id: 'rew_001',
+      title: 'Free Main Course',
+      subtitle: 'Any main dish of your choice',
+      emoji: '🍽️',
+      pointsCost: 1000,
+    ),
+    LoyaltyReward(
+      id: 'rew_002',
+      title: 'Free Dessert',
+      subtitle: 'Any dessert from the menu',
+      emoji: '🍰',
+      pointsCost: 500,
+    ),
+    LoyaltyReward(
+      id: 'rew_003',
+      title: 'Free Delivery',
+      subtitle: 'On your next order',
+      emoji: '🛵',
+      pointsCost: 300,
+    ),
+    LoyaltyReward(
+      id: 'rew_004',
+      title: '\$5 Off Your Order',
+      subtitle: 'Minimum order \$20',
+      emoji: '💰',
+      pointsCost: 250,
+    ),
+    LoyaltyReward(
+      id: 'rew_005',
+      title: 'Free Side Dish',
+      subtitle: 'Choose any side from the menu',
+      emoji: '🥗',
+      pointsCost: 200,
+    ),
+    LoyaltyReward(
+      id: 'rew_006',
+      title: 'Free Drink',
+      subtitle: 'Any drink up to \$8',
+      emoji: '🥤',
+      pointsCost: 150,
+    ),
+  ];
+
+  static const List<LoyaltyTransaction> loyaltyHistory = [
+    LoyaltyTransaction(
+      id: 'tx_001',
+      title: 'Order #4821',
+      subtitle: 'Signature Beef Burger + Drinks',
+      points: 189,
+      dateLabel: 'Today, 2:30 PM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_002',
+      title: 'Redeemed Reward',
+      subtitle: 'Free Dessert',
+      points: -500,
+      dateLabel: 'Yesterday, 7:15 PM',
+      isEarned: false,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_003',
+      title: 'Order #4756',
+      subtitle: 'Truffle Margherita + Drinks',
+      points: 225,
+      dateLabel: 'May 14, 12:00 PM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_004',
+      title: 'Referral Bonus',
+      subtitle: 'Ahmed joined via your code',
+      points: 500,
+      dateLabel: 'May 13, 9:20 AM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_005',
+      title: 'Order #4701',
+      subtitle: 'BBQ Chicken Pizza',
+      points: 210,
+      dateLabel: 'May 12, 8:45 PM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_006',
+      title: 'Redeemed Reward',
+      subtitle: 'Free Delivery',
+      points: -300,
+      dateLabel: 'May 11, 1:30 PM',
+      isEarned: false,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_007',
+      title: 'Review Bonus',
+      subtitle: 'Reviewed Creamy Carbonara',
+      points: 50,
+      dateLabel: 'May 10, 6:00 PM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_008',
+      title: 'Order #4633',
+      subtitle: 'Seafood Linguine + Wine',
+      points: 300,
+      dateLabel: 'May 9, 7:30 PM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_009',
+      title: 'Double Points Weekend',
+      subtitle: 'Weekend bonus applied to order #4633',
+      points: 300,
+      dateLabel: 'May 9, 7:30 PM',
+      isEarned: true,
+    ),
+    LoyaltyTransaction(
+      id: 'tx_010',
+      title: 'Order #4580',
+      subtitle: 'Lava Chocolate Cake + Coffee',
+      points: 110,
+      dateLabel: 'May 7, 3:15 PM',
+      isEarned: true,
+    ),
+  ];
 }
