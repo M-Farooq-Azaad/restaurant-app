@@ -74,8 +74,8 @@ class _BottomNav extends StatelessWidget {
       padding: EdgeInsets.only(
         left: Sp.xl,
         right: Sp.xl,
-        bottom: MediaQuery.of(context).padding.bottom + Sp.md,
-        top: Sp.xs,
+        bottom: MediaQuery.of(context).padding.bottom + Sp.xs,
+        top: Sp.sm,
       ),
       child: Container(
         height: 64,
@@ -170,8 +170,7 @@ class _NavItem extends StatelessWidget {
               style: AppTextStyles.labelSm.copyWith(
                 color: isSelected ? AppColors.accentDeep : colors.textTertiary,
                 fontSize: 10,
-                fontWeight:
-                    isSelected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 letterSpacing: 0.2,
               ),
               child: Text(label),

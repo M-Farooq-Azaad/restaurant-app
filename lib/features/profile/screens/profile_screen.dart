@@ -12,6 +12,12 @@ import '../../auth/providers/auth_provider.dart';
 import 'edit_profile_screen.dart';
 import 'language_screen.dart';
 import 'payment_methods_screen.dart';
+import 'notifications_screen.dart';
+import 'about_screen.dart';
+import 'favourites_screen.dart';
+import 'qr_screen.dart';
+import 'help_center_screen.dart';
+import 'order_history_screen.dart';
 import 'saved_addresses_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -90,7 +96,11 @@ class ProfileScreen extends ConsumerWidget {
                         label: 'Notifications',
                         iconColor: AppColors.warning,
                         trailing: _NotifBadge(),
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationsScreen(),
+                          ),
+                        ),
                       ),
                       _DarkModeRow(isDark: isDark, ref: ref),
                       _RowItem(
@@ -115,13 +125,21 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.receipt_long_outlined,
                         label: 'Order History',
                         iconColor: const Color(0xFF8B5CF6),
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const OrderHistoryScreen(),
+                          ),
+                        ),
                       ),
                       _RowItem(
                         icon: Icons.favorite_outline_rounded,
                         label: 'Favourites',
                         iconColor: AppColors.error,
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const FavouritesScreen(),
+                          ),
+                        ),
                         isLast: true,
                       ),
                     ],
@@ -168,14 +186,22 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.help_outline_rounded,
                         label: 'Help Center',
                         iconColor: const Color(0xFF0EA5E9),
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const HelpCenterScreen(),
+                          ),
+                        ),
                       ),
                       _RowItem(
                         icon: Icons.info_outline_rounded,
                         label: 'About',
                         iconColor: colors.textTertiary,
                         valueLabel: 'v1.0.0',
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AboutScreen(),
+                          ),
+                        ),
                         isLast: true,
                       ),
                     ],
@@ -238,7 +264,14 @@ class _ProfileHeader extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const QrScreen(),
+                            ),
+                          );
+                        },
                         icon: const Icon(
                           Icons.qr_code_rounded,
                           color: Colors.white70,

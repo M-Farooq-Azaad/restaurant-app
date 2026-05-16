@@ -18,8 +18,6 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     _Address(
       id: '1',
       type: 'Home',
-      icon: Icons.home_rounded,
-      iconColor: AppColors.success,
       street: '12A Gulberg III',
       city: 'Lahore, Punjab 54000',
       isDefault: true,
@@ -27,8 +25,6 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     _Address(
       id: '2',
       type: 'Work',
-      icon: Icons.business_rounded,
-      iconColor: const Color(0xFF6366F1),
       street: 'Office Tower, MM Alam Road',
       city: 'Lahore, Punjab 54660',
       isDefault: false,
@@ -36,8 +32,6 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     _Address(
       id: '3',
       type: 'Other',
-      icon: Icons.location_on_rounded,
-      iconColor: AppColors.warning,
       street: '45B DHA Phase 5',
       city: 'Lahore, Punjab 54810',
       isDefault: false,
@@ -51,9 +45,18 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
         a.isDefault = a.id == id;
       }
     });
+    _showSnackBar('Default address updated');
+  }
+
+  void _delete(String id) {
+    setState(() => _addresses.removeWhere((a) => a.id == id));
+    _showSnackBar('Address removed');
+  }
+
+  void _showSnackBar(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Default address updated'),
+        content: Text(msg),
         backgroundColor: AppColors.accentDeep,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -63,17 +66,48 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     );
   }
 
-  void _delete(String id) {
+  void _confirmDelete(_Address address) {
     HapticFeedback.mediumImpact();
-    setState(() => _addresses.removeWhere((a) => a.id == id));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Address removed'),
-        backgroundColor: AppColors.accentDeep,
-        behavior: SnackBarBehavior.floating,
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: context.colors.bgSecondary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Rd.lg),
+          borderRadius: BorderRadius.circular(Rd.xl),
         ),
+        title: Text(
+          'Delete Address',
+          style: AppTextStyles.cardTitle.copyWith(
+            color: context.colors.textPrimary,
+          ),
+        ),
+        content: Text(
+          'Remove "${address.type}" address? This cannot be undone.',
+          style: AppTextStyles.bodyMd.copyWith(
+            color: context.colors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancel',
+              style: AppTextStyles.labelMd.copyWith(
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _delete(address.id);
+            },
+            child: Text(
+              'Delete',
+              style: AppTextStyles.labelMd.copyWith(color: AppColors.error),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -89,37 +123,38 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
           Navigator.pop(ctx);
           _setDefault(address.id);
         },
-        onDelete: () {
-          Navigator.pop(ctx);
-          _delete(address.id);
-        },
         onEdit: () {
           Navigator.pop(ctx);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Address editing coming soon'),
-              backgroundColor: AppColors.accentDeep,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(Rd.lg),
-              ),
-            ),
-          );
+          _showAddressForm(existing: address);
+        },
+        onDelete: () {
+          Navigator.pop(ctx);
+          _confirmDelete(address);
         },
       ),
     );
   }
 
-  void _addAddress() {
-    HapticFeedback.selectionClick();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Add address coming soon'),
-        backgroundColor: AppColors.accentDeep,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Rd.lg),
-        ),
+  void _showAddressForm({_Address? existing}) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _AddressFormSheet(
+        existing: existing,
+        onSave: (updated) {
+          setState(() {
+            if (existing == null) {
+              _addresses.add(updated);
+            } else {
+              final idx = _addresses.indexWhere((a) => a.id == existing.id);
+              if (idx != -1) _addresses[idx] = updated;
+            }
+          });
+          _showSnackBar(
+            existing == null ? 'Address added' : 'Address updated',
+          );
+        },
       ),
     );
   }
@@ -156,7 +191,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: Sp.sm),
-                  if (_addresses.isEmpty) _EmptyState(),
+                  if (_addresses.isEmpty) const _EmptyState(),
                   ...List.generate(_addresses.length, (i) {
                     final address = _addresses[i];
                     return Padding(
@@ -170,7 +205,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                   const SizedBox(height: Sp.md),
                   PrimaryButton(
                     label: 'Add New Address',
-                    onPressed: _addAddress,
+                    onPressed: () => _showAddressForm(),
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).padding.bottom + Sp.xl,
@@ -185,22 +220,42 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
   }
 }
 
-// ── Models ────────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+IconData _iconForType(String type) {
+  switch (type) {
+    case 'Home':
+      return Icons.home_rounded;
+    case 'Work':
+      return Icons.business_rounded;
+    default:
+      return Icons.location_on_rounded;
+  }
+}
+
+Color _colorForType(String type) {
+  switch (type) {
+    case 'Home':
+      return AppColors.success;
+    case 'Work':
+      return const Color(0xFF6366F1);
+    default:
+      return AppColors.warning;
+  }
+}
+
+// ── Model ─────────────────────────────────────────────────────────────────────
 
 class _Address {
   final String id;
-  final String type;
-  final IconData icon;
-  final Color iconColor;
-  final String street;
-  final String city;
+  String type;
+  String street;
+  String city;
   bool isDefault;
 
   _Address({
     required this.id,
     required this.type,
-    required this.icon,
-    required this.iconColor,
     required this.street,
     required this.city,
     required this.isDefault,
@@ -218,6 +273,7 @@ class _AddressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final iconColor = _colorForType(address.type);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -244,11 +300,15 @@ class _AddressCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: address.iconColor.withValues(alpha: 0.12),
+                color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(Rd.md),
               ),
               child: Center(
-                child: Icon(address.icon, size: 20, color: address.iconColor),
+                child: Icon(
+                  _iconForType(address.type),
+                  size: 20,
+                  color: iconColor,
+                ),
               ),
             ),
             const SizedBox(width: Sp.md),
@@ -321,14 +381,14 @@ class _AddressCard extends StatelessWidget {
 class _AddressOptionsSheet extends StatelessWidget {
   final _Address address;
   final VoidCallback onSetDefault;
-  final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   const _AddressOptionsSheet({
     required this.address,
     required this.onSetDefault,
-    required this.onDelete,
     required this.onEdit,
+    required this.onDelete,
   });
 
   @override
@@ -408,11 +468,248 @@ class _SheetOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon, color: color, size: 22),
-      title: Text(
-        label,
-        style: AppTextStyles.bodyLg.copyWith(color: color),
-      ),
+      title: Text(label, style: AppTextStyles.bodyLg.copyWith(color: color)),
       onTap: onTap,
+    );
+  }
+}
+
+// ── Address form sheet ────────────────────────────────────────────────────────
+
+class _AddressFormSheet extends StatefulWidget {
+  final _Address? existing;
+  final void Function(_Address) onSave;
+
+  const _AddressFormSheet({required this.existing, required this.onSave});
+
+  @override
+  State<_AddressFormSheet> createState() => _AddressFormSheetState();
+}
+
+class _AddressFormSheetState extends State<_AddressFormSheet> {
+  static const _types = ['Home', 'Work', 'Other'];
+  final _formKey = GlobalKey<FormState>();
+  late String _type;
+  late final TextEditingController _streetCtrl;
+  late final TextEditingController _cityCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _type = widget.existing?.type ?? 'Home';
+    _streetCtrl = TextEditingController(text: widget.existing?.street ?? '');
+    _cityCtrl = TextEditingController(text: widget.existing?.city ?? '');
+  }
+
+  @override
+  void dispose() {
+    _streetCtrl.dispose();
+    _cityCtrl.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (!_formKey.currentState!.validate()) return;
+    HapticFeedback.mediumImpact();
+    final saved = _Address(
+      id: widget.existing?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      type: _type,
+      street: _streetCtrl.text.trim(),
+      city: _cityCtrl.text.trim(),
+      isDefault: widget.existing?.isDefault ?? false,
+    );
+    widget.onSave(saved);
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(Sp.base, 0, Sp.base, Sp.base),
+      padding: EdgeInsets.fromLTRB(Sp.base, Sp.base, Sp.base, bottom + Sp.base),
+      decoration: BoxDecoration(
+        color: colors.bgSecondary,
+        borderRadius: BorderRadius.circular(Rd.xxl),
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colors.divider,
+                  borderRadius: BorderRadius.circular(Rd.pill),
+                ),
+              ),
+            ),
+            const SizedBox(height: Sp.base),
+            Text(
+              widget.existing == null ? 'Add Address' : 'Edit Address',
+              style: AppTextStyles.cardTitle.copyWith(
+                color: colors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: Sp.base),
+            Text(
+              'TYPE',
+              style: AppTextStyles.labelSm.copyWith(
+                color: colors.textTertiary,
+                fontSize: 10,
+                letterSpacing: 0.8,
+              ),
+            ),
+            const SizedBox(height: Sp.sm),
+            Row(
+              children: _types.map((t) {
+                final isSelected = _type == t;
+                final isLast = t == _types.last;
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: isLast ? 0 : Sp.sm),
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() => _type = t);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.accentSoft
+                              : colors.bgTertiary,
+                          borderRadius: BorderRadius.circular(Rd.md),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.accent
+                                : Colors.transparent,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _iconForType(t),
+                              size: 14,
+                              color: isSelected
+                                  ? AppColors.accentDeep
+                                  : colors.textSecondary,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              t,
+                              style: AppTextStyles.labelSm.copyWith(
+                                color: isSelected
+                                    ? AppColors.accentDeep
+                                    : colors.textSecondary,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: Sp.base),
+            _FormField(
+              label: 'STREET ADDRESS',
+              controller: _streetCtrl,
+              hint: 'e.g. 12A Gulberg III',
+              textInputAction: TextInputAction.next,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Street is required' : null,
+            ),
+            const SizedBox(height: Sp.sm),
+            _FormField(
+              label: 'CITY / AREA',
+              controller: _cityCtrl,
+              hint: 'e.g. Lahore, Punjab 54000',
+              textInputAction: TextInputAction.done,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'City is required' : null,
+            ),
+            const SizedBox(height: Sp.base),
+            PrimaryButton(label: 'Save Address', onPressed: _save),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FormField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final String hint;
+  final TextInputAction? textInputAction;
+  final String? Function(String?)? validator;
+
+  const _FormField({
+    required this.label,
+    required this.controller,
+    required this.hint,
+    this.textInputAction,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Sp.base, vertical: Sp.md),
+      decoration: BoxDecoration(
+        color: colors.bgTertiary,
+        borderRadius: BorderRadius.circular(Rd.md),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.labelSm.copyWith(
+              color: colors.textTertiary,
+              fontSize: 10,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 3),
+          TextFormField(
+            controller: controller,
+            textInputAction: textInputAction,
+            validator: validator,
+            style: TextStyle(color: colors.textPrimary, fontSize: 15),
+            decoration: InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              hintText: hint,
+              hintStyle: TextStyle(
+                color: colors.textTertiary,
+                fontSize: 15,
+              ),
+              errorStyle: const TextStyle(color: AppColors.error, fontSize: 11),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -420,6 +717,8 @@ class _SheetOption extends StatelessWidget {
 // ── Empty state ───────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -427,17 +726,11 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: Sp.xxl),
       child: Column(
         children: [
-          Icon(
-            Icons.location_off_outlined,
-            size: 56,
-            color: colors.textTertiary,
-          ),
+          Icon(Icons.location_off_outlined, size: 56, color: colors.textTertiary),
           const SizedBox(height: Sp.base),
           Text(
             'No saved addresses',
-            style: AppTextStyles.cardTitle.copyWith(
-              color: colors.textSecondary,
-            ),
+            style: AppTextStyles.cardTitle.copyWith(color: colors.textSecondary),
           ),
           const SizedBox(height: Sp.xs),
           Text(

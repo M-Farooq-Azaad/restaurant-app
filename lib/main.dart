@@ -23,6 +23,7 @@ class RestaurantApp extends ConsumerWidget {
       darkTheme: AppTheme.dark,
       themeMode:
           themeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
+      themeAnimationDuration: Duration.zero,
       routerConfig: router,
     );
   }
