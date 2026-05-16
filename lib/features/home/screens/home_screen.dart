@@ -8,11 +8,14 @@ import '../../../mock/mock_data.dart';
 import '../../loyalty/screens/loyalty_screen.dart';
 import '../../menu/screens/menu_screen.dart';
 import '../../profile/screens/profile_screen.dart';
-import '../widgets/gamification_card.dart';
+import '../widgets/active_coupons_section.dart';
+import '../widgets/active_missions_card.dart';
+import '../widgets/category_chips_row.dart';
 import '../widgets/loyalty_card.dart';
 import '../widgets/menu_item_card.dart';
 import '../widgets/promo_carousel.dart';
 import '../widgets/quick_actions_row.dart';
+import '../widgets/recent_orders_section.dart';
 import '../widgets/section_header.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -158,8 +161,9 @@ class _NavItem extends StatelessWidget {
                     isSelected ? selectedIcon : icon,
                     key: ValueKey(isSelected),
                     size: isSelected ? 22 : 20,
-                    color:
-                        isSelected ? AppColors.accentDeep : colors.textTertiary,
+                    color: isSelected
+                        ? AppColors.accentDeep
+                        : colors.textTertiary,
                   ),
                 ),
               ),
@@ -168,9 +172,11 @@ class _NavItem extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: AppTextStyles.labelSm.copyWith(
-                color: isSelected ? AppColors.accentDeep : colors.textTertiary,
+                color:
+                    isSelected ? AppColors.accentDeep : colors.textTertiary,
                 fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight:
+                    isSelected ? FontWeight.w600 : FontWeight.w400,
                 letterSpacing: 0.2,
               ),
               child: Text(label),
@@ -181,6 +187,8 @@ class _NavItem extends StatelessWidget {
     );
   }
 }
+
+// ── Home Tab ──────────────────────────────────────────────────────────────────
 
 class _HomeTab extends StatelessWidget {
   const _HomeTab();
@@ -198,12 +206,26 @@ class _HomeTab extends StatelessWidget {
             ? 'Good afternoon'
             : 'Good evening';
 
+    // Personalized subtitle
+    const platinumThreshold = 4000;
+    final remaining = platinumThreshold - user.totalPoints;
+    final subtitle = '$remaining pts away from Platinum ✨';
+
+    final initials = user.fullName
+        .trim()
+        .split(' ')
+        .take(2)
+        .map((p) => p[0])
+        .join()
+        .toUpperCase();
+
     return CustomScrollView(
       slivers: [
+        // ── App Bar ──────────────────────────────────────────────────────
         SliverAppBar(
           floating: true,
           snap: true,
-          toolbarHeight: 64,
+          toolbarHeight: 72,
           backgroundColor: colors.bgPrimary,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
@@ -223,13 +245,17 @@ class _HomeTab extends StatelessWidget {
                   color: colors.textPrimary,
                 ),
               ),
+              Text(
+                subtitle,
+                style: AppTextStyles.labelSm.copyWith(
+                  color: AppColors.accentDeep,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
           actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.search_rounded, color: colors.textPrimary),
-            ),
             Stack(
               children: [
                 IconButton(
@@ -253,45 +279,169 @@ class _HomeTab extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: Sp.xs),
+            Padding(
+              padding: const EdgeInsets.only(right: Sp.md),
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.goldGradient,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accent.withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      initials,
+                      style: AppTextStyles.labelMd.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
+
         SliverToBoxAdapter(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: Sp.md),
+
+              // ── Search Bar ────────────────────────────────────────────
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: Sp.base),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: colors.bgSecondary,
+                      borderRadius: BorderRadius.circular(Rd.pill),
+                      border: Border.all(color: colors.divider),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: Sp.base),
+                        Icon(Icons.search_rounded,
+                            color: colors.textTertiary, size: 20),
+                        const SizedBox(width: Sp.sm),
+                        Expanded(
+                          child: Text(
+                            'Search meals, drinks, desserts…',
+                            style: AppTextStyles.bodyMd
+                                .copyWith(color: colors.textTertiary),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: Sp.sm, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.accentSoft,
+                            borderRadius: BorderRadius.circular(Rd.lg),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.tune_rounded,
+                                  size: 13,
+                                  color: AppColors.accentDeep),
+                              const SizedBox(width: 3),
+                              Text(
+                                'Filter',
+                                style: AppTextStyles.labelSm.copyWith(
+                                  color: AppColors.accentDeep,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: Sp.lg),
+
+              // ── Loyalty Wallet Card ───────────────────────────────────
               const LoyaltyCard(user: MockData.currentUser),
               const SizedBox(height: Sp.xl),
+
+              // ── Category Chips ────────────────────────────────────────
+              const CategoryChipsRow(),
+              const SizedBox(height: Sp.xl),
+
+              // ── Quick Actions ─────────────────────────────────────────
               const QuickActionsRow(),
               const SizedBox(height: Sp.xl),
+
+              // ── Promo Carousel ────────────────────────────────────────
               const PromoCarousel(),
               const SizedBox(height: Sp.xl),
+
+              // ── Active Missions ───────────────────────────────────────
+              const ActiveMissionsCard(),
+              const SizedBox(height: Sp.xl),
+
+              // ── Today's Picks ─────────────────────────────────────────
               SectionHeader(title: "Today's Picks", onSeeAll: () {}),
               const SizedBox(height: Sp.md),
               SizedBox(
-                height: 270,
+                height: 290,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: Sp.base),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: Sp.base),
                   itemCount: todaysPicks.length,
-                  itemBuilder: (_, i) => MenuItemCard(item: todaysPicks[i]),
+                  itemBuilder: (_, i) =>
+                      MenuItemCard(item: todaysPicks[i]),
                 ),
               ),
               const SizedBox(height: Sp.xl),
+
+              // ── Best Sellers ──────────────────────────────────────────
               SectionHeader(title: 'Best Sellers', onSeeAll: () {}),
               const SizedBox(height: Sp.md),
               SizedBox(
-                height: 270,
+                height: 290,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: Sp.base),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: Sp.base),
                   itemCount: bestSellers.length,
-                  itemBuilder: (_, i) => MenuItemCard(item: bestSellers[i]),
+                  itemBuilder: (_, i) =>
+                      MenuItemCard(item: bestSellers[i]),
                 ),
               ),
               const SizedBox(height: Sp.xl),
-              const GamificationCard(),
+
+              // ── Recent Orders ─────────────────────────────────────────
+              const RecentOrdersSection(),
+              const SizedBox(height: Sp.xl),
+
+              // ── Active Coupons ────────────────────────────────────────
+              const ActiveCouponsSection(),
               const SizedBox(height: Sp.xxxl),
             ],
           ),

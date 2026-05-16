@@ -1,5 +1,63 @@
 import 'package:flutter/material.dart';
 
+class MockMission {
+  final String id;
+  final String title;
+  final String subtitle;
+  final String emoji;
+  final int current;
+  final int target;
+  final int rewardPoints;
+
+  const MockMission({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.emoji,
+    required this.current,
+    required this.target,
+    required this.rewardPoints,
+  });
+}
+
+class MockRecentOrder {
+  final String id;
+  final String orderNumber;
+  final List<String> itemNames;
+  final double total;
+  final int pointsEarned;
+  final String dateLabel;
+  final String emoji;
+
+  const MockRecentOrder({
+    required this.id,
+    required this.orderNumber,
+    required this.itemNames,
+    required this.total,
+    required this.pointsEarned,
+    required this.dateLabel,
+    required this.emoji,
+  });
+}
+
+class MockCoupon {
+  final String id;
+  final String code;
+  final String title;
+  final String subtitle;
+  final String expiryLabel;
+  final Color bgColor;
+
+  const MockCoupon({
+    required this.id,
+    required this.code,
+    required this.title,
+    required this.subtitle,
+    required this.expiryLabel,
+    required this.bgColor,
+  });
+}
+
 class MockUser {
   final String id;
   final String fullName;
@@ -58,6 +116,8 @@ class MenuItem {
   });
 }
 
+enum PromoPattern { burst, bubbles, diamonds, waves }
+
 class PromoItem {
   final String id;
   final String title;
@@ -66,6 +126,7 @@ class PromoItem {
   final Color bgStart;
   final Color bgEnd;
   final String emoji;
+  final PromoPattern pattern;
 
   const PromoItem({
     required this.id,
@@ -75,6 +136,7 @@ class PromoItem {
     required this.bgStart,
     required this.bgEnd,
     required this.emoji,
+    required this.pattern,
   });
 }
 
@@ -847,6 +909,7 @@ class MockData {
       bgStart: Color(0xFF7B1E1E),
       bgEnd: Color(0xFFB83232),
       emoji: '🍔',
+      pattern: PromoPattern.burst,
     ),
     PromoItem(
       id: 'promo_002',
@@ -856,6 +919,7 @@ class MockData {
       bgStart: Color(0xFF1C2A3A),
       bgEnd: Color(0xFF2D4A68),
       emoji: '🍰',
+      pattern: PromoPattern.bubbles,
     ),
     PromoItem(
       id: 'promo_003',
@@ -865,6 +929,7 @@ class MockData {
       bgStart: Color(0xFF1A3A2A),
       bgEnd: Color(0xFF2D6A4F),
       emoji: '⭐',
+      pattern: PromoPattern.diamonds,
     ),
     PromoItem(
       id: 'promo_004',
@@ -874,6 +939,7 @@ class MockData {
       bgStart: Color(0xFF3D2B1F),
       bgEnd: Color(0xFF6B4226),
       emoji: '🍽️',
+      pattern: PromoPattern.waves,
     ),
   ];
 
@@ -933,6 +999,93 @@ class MockData {
       subtitle: 'Any drink up to \$8',
       emoji: '🥤',
       pointsCost: 150,
+    ),
+  ];
+
+  static const List<MockMission> missions = [
+    MockMission(
+      id: 'mission_001',
+      title: 'Order 2 Burgers',
+      subtitle: 'Daily challenge',
+      emoji: '🍔',
+      current: 1,
+      target: 2,
+      rewardPoints: 200,
+    ),
+    MockMission(
+      id: 'mission_002',
+      title: 'Spend \$50 This Week',
+      subtitle: 'Weekly challenge',
+      emoji: '💰',
+      current: 28,
+      target: 50,
+      rewardPoints: 500,
+    ),
+    MockMission(
+      id: 'mission_003',
+      title: 'Try 3 New Items',
+      subtitle: 'Explorer challenge',
+      emoji: '🌟',
+      current: 2,
+      target: 3,
+      rewardPoints: 300,
+    ),
+  ];
+
+  static const List<MockRecentOrder> recentOrders = [
+    MockRecentOrder(
+      id: 'order_001',
+      orderNumber: '#4821',
+      itemNames: ['Signature Beef Burger', 'Mango Passion Smoothie'],
+      total: 27.98,
+      pointsEarned: 189,
+      dateLabel: 'Today, 2:30 PM',
+      emoji: '🍔',
+    ),
+    MockRecentOrder(
+      id: 'order_002',
+      orderNumber: '#4756',
+      itemNames: ['Truffle Margherita', 'Fresh Lemonade'],
+      total: 28.49,
+      pointsEarned: 225,
+      dateLabel: 'Yesterday',
+      emoji: '🍕',
+    ),
+    MockRecentOrder(
+      id: 'order_003',
+      orderNumber: '#4701',
+      itemNames: ['Creamy Carbonara', 'Tiramisu'],
+      total: 27.98,
+      pointsEarned: 210,
+      dateLabel: 'May 12',
+      emoji: '🍝',
+    ),
+  ];
+
+  static const List<MockCoupon> coupons = [
+    MockCoupon(
+      id: 'coupon_001',
+      code: 'GOLD20',
+      title: '20% Off',
+      subtitle: 'On your next burger order',
+      expiryLabel: 'Expires in 2 days',
+      bgColor: Color(0xFF0F2A1A),
+    ),
+    MockCoupon(
+      id: 'coupon_002',
+      code: 'FREEDRINK',
+      title: 'Free Drink',
+      subtitle: 'With any main course',
+      expiryLabel: 'Expires today',
+      bgColor: Color(0xFF0A1A2A),
+    ),
+    MockCoupon(
+      id: 'coupon_003',
+      code: 'LOYALTY50',
+      title: '+50 Pts',
+      subtitle: 'Bonus on your next order',
+      expiryLabel: 'Expires in 5 days',
+      bgColor: Color(0xFF2A1A0A),
     ),
   ];
 

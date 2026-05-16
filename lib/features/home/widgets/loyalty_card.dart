@@ -30,7 +30,7 @@ class LoyaltyCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(Rd.xxl),
           boxShadow: [
             BoxShadow(
-              color: AppColors.accent.withValues(alpha: 0.28),
+              color: AppColors.accent.withValues(alpha: 0.13),
               blurRadius: 28,
               offset: const Offset(0, 12),
             ),
@@ -121,12 +121,81 @@ class LoyaltyCard extends StatelessWidget {
                         : 'Platinum tier reached! 🏆',
                     style: AppTextStyles.bodySm.copyWith(color: Colors.white54),
                   ),
+                  const SizedBox(height: Sp.lg),
+                  Container(
+                    height: 1,
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
+                  const SizedBox(height: Sp.md),
+                  Row(
+                    children: [
+                      _AnalyticsStat(label: 'Monthly Spend', value: '\$187'),
+                      _VerticalDivider(),
+                      _AnalyticsStat(label: 'Pts Earned', value: '+420'),
+                      _VerticalDivider(),
+                      _AnalyticsStat(
+                        label: 'Tier Progress',
+                        value: '${(progress * 100).round()}%',
+                        valueColor: AppColors.accent,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AnalyticsStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  const _AnalyticsStat({
+    required this.label,
+    required this.value,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            value,
+            style: AppTextStyles.itemTitle.copyWith(
+              color: valueColor ?? Colors.white,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: AppTextStyles.labelSm.copyWith(
+              color: Colors.white38,
+              fontSize: 9,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VerticalDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 30,
+      color: Colors.white.withValues(alpha: 0.10),
     );
   }
 }
