@@ -9,6 +9,7 @@ import '../../../core/theme/app_theme_extension.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../mock/mock_data.dart';
 import '../../auth/providers/auth_provider.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -48,7 +49,11 @@ class ProfileScreen extends ConsumerWidget {
                         icon: Icons.person_outline_rounded,
                         label: 'Edit Profile',
                         iconColor: AppColors.accent,
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const EditProfileScreen(),
+                          ),
+                        ),
                       ),
                       _RowItem(
                         icon: Icons.location_on_outlined,
