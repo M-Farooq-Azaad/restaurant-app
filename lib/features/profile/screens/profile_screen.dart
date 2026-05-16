@@ -188,12 +188,6 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = user.fullName
-        .split(' ')
-        .take(2)
-        .map((w) => w.isNotEmpty ? w[0] : '')
-        .join();
-
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -238,8 +232,11 @@ class _ProfileHeader extends StatelessWidget {
                     width: 84,
                     height: 84,
                     decoration: BoxDecoration(
-                      gradient: AppColors.goldGradient,
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.accent,
+                        width: 2.5,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.accent.withValues(alpha: 0.40),
@@ -248,13 +245,10 @@ class _ProfileHeader extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Center(
-                      child: Text(
-                        initials,
-                        style: AppTextStyles.sectionTitle.copyWith(
-                          color: Colors.white,
-                          fontSize: 30,
-                        ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/avatar.jpg',
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
